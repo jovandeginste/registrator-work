@@ -12,6 +12,7 @@ type AdapterFactory interface {
 }
 
 type RegistryAdapter interface {
+	EnableDebug() error
 	Ping() error
 	Register(service *Service) error
 	Deregister(service *Service) error

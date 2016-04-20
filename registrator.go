@@ -26,7 +26,7 @@ var deregister = flag.String("deregister", "always", "Deregister exited services
 var retryAttempts = flag.Int("retry-attempts", 0, "Max retry attempts to establish a connection with the backend. Use -1 for infinite retries")
 var retryInterval = flag.Int("retry-interval", 2000, "Interval (in millisecond) between retry-attempts.")
 var cleanup = flag.Bool("cleanup", false, "Remove dangling services")
-
+var debug = flag.Bool("debug", false, "Show debug output")
 
 func getopt(name, def string) string {
 	if env := os.Getenv(name); env != "" {
@@ -82,6 +82,11 @@ func main() {
 	})
 
 	assert(err)
+
+	if *debug {
+		log.Println("Enabling debug output")
+		_ = b.EnableDebug
+	}
 
 	attempt := 0
 	for *retryAttempts == -1 || attempt <= *retryAttempts {

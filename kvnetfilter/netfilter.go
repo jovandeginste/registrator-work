@@ -55,6 +55,12 @@ type NetfilterAdapter struct {
 	client  *consulapi.Client
 	path    string
 	aclpath string
+	debug   bool
+}
+
+func (r *NetfilterAdapter) EnableDebug() error {
+	r.debug = true
+	return nil
 }
 
 func (r *NetfilterAdapter) Ping() error {
@@ -81,7 +87,9 @@ func (r *NetfilterAdapter) Register(service *bridge.Service) error {
 		}
 
 		if len(srcRanges) > 0 {
-			log.Println("would allow ", srcRanges)
+			if r.debug {
+				log.Println("would allow ", srcRanges)
+			}
 			for _, src := range srcRanges {
 				res := strings.Split(src, "#")
 				if len(res) != 2 {
@@ -118,7 +126,9 @@ func (r *NetfilterAdapter) Deregister(service *bridge.Service) error {
 		}
 
 		if len(srcRanges) > 0 {
-			log.Println("would allow ", srcRanges)
+			if r.debug {
+				log.Println("would allow ", srcRanges)
+			}
 			for _, src := range srcRanges {
 				res := strings.Split(src, "#")
 				if len(res) != 2 {
@@ -190,11 +200,15 @@ func (r *NetfilterAdapter) kvDeregister(service *bridge.Service) error {
 func (r *NetfilterAdapter) kvFindACL(key string) []string {
 	var acls []string
 	url := "/" + r.aclpath + "/" + key
-	log.Println("looking for ACL in ", url)
+	if r.debug {
+		log.Println("looking for ACL in ", url)
+	}
 	kps, _, _ := r.client.KV().List(url, nil)
 	for _, kp := range kps {
 		if len(kp.Value) > 0 {
-			log.Println("keys to search ", string(kp.Value))
+			if r.debug {
+				log.Println("keys to search ", string(kp.Value))
+			}
 			// if ipv6 address, add
 			if strings.Contains(string(kp.Value), ":") {
 				acls = append(acls, string(kp.Value))

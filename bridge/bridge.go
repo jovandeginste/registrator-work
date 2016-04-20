@@ -46,6 +46,10 @@ func New(docker *dockerapi.Client, adapterUri string, config Config) (*Bridge, e
 	}, nil
 }
 
+func (b *Bridge) EnableDebug() error {
+	return b.registry.EnableDebug()
+}
+
 func (b *Bridge) Ping() error {
 	return b.registry.Ping()
 }
